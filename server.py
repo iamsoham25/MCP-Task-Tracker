@@ -108,7 +108,7 @@ def add_daily_work_log(
 
             Log ID : {log_id}
 
-Date : {work_date}
+            Date : {work_date}
 
 Day : {day}
 
