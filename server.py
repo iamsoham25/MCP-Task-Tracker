@@ -106,7 +106,7 @@ def add_daily_work_log(
         f"""
             Daily Work Log Added Successfully
 
-Log ID : {log_id}
+            Log ID : {log_id}
 
 Date : {work_date}
 
