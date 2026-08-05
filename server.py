@@ -104,7 +104,7 @@ def add_daily_work_log(
 
     return (
         f"""
-Daily Work Log Added Successfully
+            Daily Work Log Added Successfully
 
 Log ID : {log_id}
 
