@@ -110,7 +110,7 @@ def add_daily_work_log(
 
             Date : {work_date}
 
-Day : {day}
+            Day : {day}
 
 Status : To Do
 """
