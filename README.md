@@ -707,8 +707,8 @@ server.py
  |
  v
 get_connection()
- |
- v
+        |
+        v
     database.py
         |
         v
