@@ -710,8 +710,8 @@ get_connection()
  |
  v
 database.py
- |
- v
+        |
+        v
      SQLite
         |
         v
