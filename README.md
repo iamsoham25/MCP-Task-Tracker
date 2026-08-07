@@ -712,13 +712,13 @@ get_connection()
 database.py
  |
  v
-SQLite
+     SQLite
         |
         v
 intern_tracker.db
         |
         v
-daily_work_log
+  daily_work_log
 ```
 
 For example:
