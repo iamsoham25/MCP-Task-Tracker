@@ -1,24 +1,54 @@
-# Intern Task Tracker - MCP Server
+# Task Tracker using Model Context Protocol (MCP)
 
-A Python-based **Model Context Protocol (MCP) Server** developed for tracking daily internship work.
+A Python-based **Task Tracker MCP Server** built using the **Model Context Protocol (MCP)**.
 
-The project uses **FastMCP** to expose task-management tools and **SQLite** to permanently store Daily Work Log information.
+The project demonstrates how an MCP server can be used to manage daily work tasks through MCP Tools while storing task information permanently in a **SQLite database**.
+
+The server is built using **FastMCP** and can be tested interactively using the **MCP Inspector**.
 
 ---
 
 ## Project Overview
 
-The Intern Task Tracker allows internship work details to be managed through MCP tools.
+The Task Tracker is designed to manage and track daily work activities through an MCP Server.
 
-The current system supports:
+Users can add work logs, retrieve existing tasks, update task status, delete records, and generate work summaries using MCP Tools.
 
-- Adding Daily Work Logs
-- Listing Daily Work Logs
-- Updating a work log status to Done
-- Deleting Daily Work Logs
-- Viewing an overall work summary
-- Storing all work log information in SQLite
-- Testing MCP tools through MCP Inspector
+All task information entered through the MCP interface is stored in:
+
+```text
+intern_tracker.db
+```
+
+The project currently demonstrates three important components:
+
+```text
+MCP Server
+   |
+   +-- MCP Tools
+   |
+   +-- MCP Prompts
+   |
+   +-- SQLite Database
+```
+
+---
+
+## Features
+
+The current Task Tracker supports:
+
+- Add Daily Work Logs
+- List stored Daily Work Logs
+- Filter logs based on status
+- Update task status to Done
+- Delete Daily Work Logs
+- Generate work summary
+- Automatically calculate the day from the work date
+- Automatically assign `To Do` status to new tasks
+- Store all task information permanently in SQLite
+- Generate structured Daily Work Log instructions using MCP Prompts
+- Test MCP Tools and Prompts through MCP Inspector
 
 ---
 
@@ -29,12 +59,47 @@ The current system supports:
 - FastMCP
 - SQLite
 - MCP Inspector
-- VS Code
 - Node.js / NPX
+- Visual Studio Code
 
 ---
 
-## Project Structure
+# Project Architecture
+
+```text
+                     User / MCP Client
+                            |
+                            v
+                     MCP Inspector
+                            |
+                            v
+                    FastMCP Server
+                      (server.py)
+                            |
+             +--------------+--------------+
+             |                             |
+             v                             v
+        MCP Tools                     MCP Prompts
+             |                             |
+             |                    Structured Prompt
+             |                       Generation
+             |
+             v
+        database.py
+             |
+             v
+          SQLite
+             |
+             v
+     intern_tracker.db
+             |
+             v
+     daily_work_log table
+```
+
+---
+
+# Project Structure
 
 ```text
 MCP_Server/
@@ -50,70 +115,128 @@ MCP_Server/
 └── __pycache__/
 ```
 
-### server.py
+### `server.py`
 
-Contains the MCP server and all MCP tools.
+Contains the main FastMCP server.
 
-### database.py
+It includes:
 
-Handles:
+- MCP Tools
+- MCP Prompts
+- Database operations through `database.py`
+- MCP server initialization
 
-- SQLite connection
+### `database.py`
+
+Handles SQLite database functionality including:
+
+- Database connection
 - Database initialization
 - Table creation
 - Database reset functionality
 
-### intern_tracker.db
+### `intern_tracker.db`
 
 SQLite database used to permanently store Daily Work Log records.
 
-### requirements.txt
+### `requirements.txt`
 
-Contains the Python dependencies required by the project.
+Contains the Python dependencies required to run the project.
+
+### `README.md`
+
+Contains project documentation, setup instructions, architecture, and usage information.
 
 ---
 
-# Daily Work Log Structure
+# SQLite Database
 
-The `daily_work_log` table stores the following information:
+The project uses SQLite for persistent task storage.
+
+The database file is:
+
+```text
+intern_tracker.db
+```
+
+The main table is:
+
+```text
+daily_work_log
+```
+
+## Daily Work Log Structure
 
 | Field | Description |
 |---|---|
-| id | Unique ID of the work log |
-| work_date | Date of work |
-| day | Day automatically calculated from date |
-| task_description | Work performed / task description |
-| deliverables | Deliverables or output |
-| blockers | Blockers or dependencies |
-| hours_spent | Total working hours |
-| status | Current task status |
-| notes | Additional comments |
-| created_at | Record creation timestamp |
-| updated_at | Last update timestamp |
+| `id` | Unique ID for each work log |
+| `work_date` | Date of the task |
+| `day` | Day automatically calculated from the date |
+| `task_description` | Description of the work performed |
+| `deliverables` | Output or deliverables produced |
+| `blockers` | Blockers or dependencies |
+| `hours_spent` | Total working hours |
+| `status` | Current task status |
+| `notes` | Additional comments |
+| `created_at` | Record creation timestamp |
+| `updated_at` | Last update timestamp |
 
-When a new Daily Work Log is created, its status is automatically:
+---
+
+# Task Status Workflow
+
+When a new Daily Work Log is created using:
+
+```text
+add_daily_work_log
+```
+
+the task status is automatically set to:
 
 ```text
 To Do
 ```
 
-The `update_work_status` MCP tool changes the status to:
+The status does not need to be entered manually while creating a task.
+
+The task remains:
+
+```text
+To Do
+```
+
+until the `update_work_status` tool is executed.
+
+After updating the work status, it becomes:
 
 ```text
 Done
+```
+
+Therefore, the basic task lifecycle is:
+
+```text
+New Task
+   |
+   v
+ To Do
+   |
+   | update_work_status
+   v
+ Done
 ```
 
 ---
 
 # MCP Tools
 
-The server currently provides five MCP tools.
+The server currently provides five main MCP Tools.
 
-## 1. add_daily_work_log
+## 1. `add_daily_work_log`
 
-Adds a new Daily Work Log to the SQLite database.
+Creates a new Daily Work Log and stores it in SQLite.
 
-Inputs include:
+### Inputs
 
 - Work Date
 - Task Description
@@ -122,53 +245,202 @@ Inputs include:
 - Hours Spent
 - Notes
 
-The day is automatically calculated from the entered date.
+Example:
 
-The default status is automatically set to `To Do`.
+```text
+Work Date:
+2026-08-05
+
+Task Description:
+Implemented SQLite database integration for the MCP Task Tracker.
+
+Deliverables:
+Successfully connected MCP tools with SQLite database storage.
+
+Blockers:
+N/A
+
+Hours Spent:
+8
+
+Notes:
+Database integration completed successfully.
+```
+
+The server automatically calculates:
+
+```text
+Day
+```
+
+and automatically assigns:
+
+```text
+Status: To Do
+```
 
 ---
 
-## 2. list_daily_work_logs
+## 2. `list_daily_work_logs`
 
-Retrieves the Daily Work Logs stored in the database.
+Retrieves Daily Work Logs stored inside `intern_tracker.db`.
 
-Logs can optionally be filtered using their status.
+The tool can return all records or optionally filter them based on status.
 
 Examples:
 
 ```text
 To Do
-Done
 ```
 
----
-
-## 3. update_work_status
-
-Marks an existing Daily Work Log as:
+or:
 
 ```text
 Done
 ```
 
-The Log ID is required to identify the record.
+This tool is useful for verifying that information entered through the MCP interface has been successfully stored in SQLite.
 
 ---
 
-## 4. delete_daily_work_log
+## 3. `update_work_status`
 
-Deletes a Daily Work Log using its Log ID.
+Updates an existing Daily Work Log to:
+
+```text
+Done
+```
+
+The tool requires:
+
+```text
+Log ID
+```
+
+Example:
+
+```text
+Log ID: 5
+```
+
+After execution:
+
+```text
+To Do
+   |
+   v
+Done
+```
+
+The `updated_at` timestamp is also updated.
 
 ---
 
-## 5. get_work_summary
+## 4. `delete_daily_work_log`
 
-Returns a summary containing:
+Deletes an existing Daily Work Log from the SQLite database.
+
+The tool requires the:
+
+```text
+Log ID
+```
+
+Example:
+
+```text
+Log ID: 5
+```
+
+The corresponding record is permanently removed from the `daily_work_log` table.
+
+---
+
+## 5. `get_work_summary`
+
+Generates an overall summary of the stored work logs.
+
+The summary contains:
 
 - Total Work Logs
-- Completed Logs
-- To Do Logs
+- Completed Work Logs
+- To Do Work Logs
 - Total Hours Spent
+
+Example output:
+
+```json
+{
+    "total_work_logs": 6,
+    "completed": 3,
+    "todo": 3,
+    "total_hours": 48
+}
+```
+
+---
+
+# MCP Prompts
+
+The project also demonstrates MCP Prompt functionality.
+
+Prompts are different from Tools.
+
+```text
+MCP Tool
+   |
+   +-- Performs an operation
+
+MCP Prompt
+   |
+   +-- Provides structured instructions/context
+```
+
+For example, a Tool can insert a task into SQLite, while a Prompt can help structure the information that should be used for creating a Daily Work Log.
+
+---
+
+## `create_daily_work_log_prompt`
+
+This prompt accepts basic work information and generates structured instructions for preparing a professional Daily Work Log.
+
+### Inputs
+
+```text
+Work Date
+Work Done
+```
+
+Example:
+
+```text
+Work Date:
+2026-08-05
+
+Work Done:
+Created the SQLite database and connected it with the MCP server.
+```
+
+The prompt structures the information around:
+
+```text
+Work Date
+Day
+Task Description
+Deliverables
+Blockers
+Hours Spent
+Status
+Notes
+```
+
+New work is treated as:
+
+```text
+Status: To Do
+```
+
+> MCP Prompts generate structured instructions. They do not directly insert information into the SQLite database. Database operations are handled by MCP Tools.
 
 ---
 
@@ -176,7 +448,7 @@ Returns a summary containing:
 
 ## 1. Open the Project
 
-Open the project folder in VS Code:
+Open PowerShell or the VS Code terminal and navigate to the project directory:
 
 ```powershell
 cd D:\MCP_Server
@@ -184,7 +456,7 @@ cd D:\MCP_Server
 
 ---
 
-## 2. Activate Virtual Environment
+## 2. Activate the Virtual Environment
 
 Run:
 
@@ -192,13 +464,15 @@ Run:
 .\venv\Scripts\Activate.ps1
 ```
 
-The terminal should show:
+The terminal should change to:
 
 ```text
 (venv) PS D:\MCP_Server>
 ```
 
-### PowerShell Execution Policy Issue
+---
+
+## PowerShell Execution Policy Issue
 
 If PowerShell prevents the virtual environment from activating, run:
 
@@ -206,7 +480,7 @@ If PowerShell prevents the virtual environment from activating, run:
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 ```
 
-Then:
+Then activate the environment again:
 
 ```powershell
 .\venv\Scripts\Activate.ps1
@@ -216,9 +490,9 @@ Then:
 
 # Running the Project
 
-The following commands are used to verify and run the MCP server.
+## Step 1 - Check `server.py`
 
-## Step 1 - Check server.py for syntax errors
+Before starting the MCP server, verify that `server.py` does not contain Python syntax errors.
 
 Run:
 
@@ -226,11 +500,11 @@ Run:
 python -m py_compile server.py
 ```
 
-If no error appears, the Python file compiled successfully.
+If no output appears, the file compiled successfully.
 
 ---
 
-## Step 2 - Verify the MCP Server
+## Step 2 - Verify MCP Server Loading
 
 Run:
 
@@ -246,7 +520,7 @@ Server loaded successfully
 
 ---
 
-## Step 3 - Initialize the SQLite Database
+## Step 3 - Initialize SQLite Database
 
 Run:
 
@@ -262,7 +536,21 @@ Intern Tracker Database Initialized Successfully
 ==================================================
 ```
 
-This creates the database/table if it does not already exist.
+This creates:
+
+```text
+intern_tracker.db
+```
+
+and the:
+
+```text
+daily_work_log
+```
+
+table if they do not already exist.
+
+Existing data is not removed during normal initialization.
 
 ---
 
@@ -290,15 +578,15 @@ Auth token: ...
 Opening browser...
 ```
 
-> The port numbers and authentication token can change every time MCP Inspector starts.
+MCP Inspector should automatically open in the browser.
 
-The browser should open MCP Inspector automatically.
+> The MCP Inspector authentication token and port numbers may change each time the Inspector is started.
 
 ---
 
-# Quick Run Commands
+# Quick Start
 
-For normal development, use:
+For normal development, the project can be started using:
 
 ```powershell
 cd D:\MCP_Server
@@ -312,7 +600,7 @@ python database.py
 npx @modelcontextprotocol/inspector python server.py
 ```
 
-For additional server verification, run:
+Optional server verification:
 
 ```powershell
 python -c "from server import mcp; print('Server loaded successfully')"
@@ -322,69 +610,146 @@ python -c "from server import mcp; print('Server loaded successfully')"
 
 # Using MCP Inspector
 
-After MCP Inspector opens:
+After MCP Inspector opens, the server can be tested from the browser interface.
 
-1. Open the **Tools** section.
-2. Select `add_daily_work_log`.
-3. Enter the work log information.
-4. Click **Execute Tool**.
-5. Select `list_daily_work_logs`.
-6. Execute the tool to verify that the record was stored.
-7. Use `update_work_status` to mark a work log as Done.
-8. Use `delete_daily_work_log` when a record needs to be removed.
-9. Use `get_work_summary` to view the overall internship work summary.
+### Testing Tools
+
+Open:
+```text
+Tools
+```
+
+Available tools include:
+
+```text
+add_daily_work_log
+list_daily_work_logs
+update_work_status
+delete_daily_work_log
+get_work_summary
+```
+
+To create a task:
+
+```text
+Tools
+   |
+   v
+add_daily_work_log
+   |
+   v
+Enter Task Information
+   |
+   v
+Execute Tool
+   |
+   v
+server.py
+   |
+   v
+SQLite
+   |
+   v
+intern_tracker.db
+```
+
+After adding a task, execute:
+
+```text
+list_daily_work_logs
+```
+
+to confirm that the record has been stored.
+
+---
+
+# Using MCP Prompts
+
+Open:
+
+```text
+Prompts
+```
+
+Select:
+
+```text
+create_daily_work_log_prompt
+```
+
+Enter:
+
+```text
+Work Date
+Work Done
+```
+
+The MCP server will return the structured prompt that can be used by an MCP-compatible AI client.
 
 ---
 
 # Data Flow
 
+The database workflow is:
+
 ```text
-    MCP Inspector
-          |
-          v
-      MCP Tool
-          |
-          v
-      server.py
-          |
-          v
-     database.py
-          |
-          v
-        SQLite
-          |
-          v
-    intern_tracker.db
-          |
-          v
-    daily_work_log
+User
+ |
+ v
+MCP Inspector
+ |
+ v
+MCP Tool
+ |
+ v
+server.py
+ |
+ v
+get_connection()
+ |
+ v
+database.py
+ |
+ v
+SQLite
+ |
+ v
+intern_tracker.db
+ |
+ v
+daily_work_log
 ```
 
 For example:
 
 ```text
-User enters Daily Work Log
+User enters task information
           |
           v
-   add_daily_work_log
+ add_daily_work_log
           |
           v
-    INSERT SQL Query
+      server.py
           |
           v
-   intern_tracker.db
+    SQL INSERT
           |
           v
-  daily_work_log table
+ intern_tracker.db
+          |
+          v
+ daily_work_log
 ```
 
 ---
 
 # Viewing Stored Data
 
-The `intern_tracker.db` file is a binary SQLite database file, so it should not be opened as a normal text file.
+The `intern_tracker.db` file is a SQLite binary database file.
 
-Use a SQLite viewer/editor extension in VS Code.
+Therefore, it should not be opened as a normal text file.
+
+Use a SQLite database viewer/editor extension in VS Code.
 
 Open:
 
@@ -392,64 +757,124 @@ Open:
 intern_tracker.db
 ```
 
-Then select:
+Then navigate to:
 
 ```text
 TABLES
+   |
    └── daily_work_log
 ```
 
-The stored records will be displayed in table format.
+The stored task records will appear in table format.
 
-You can also verify the data from the terminal:
+---
+
+## Verify Data Using Terminal
+
+The database can also be checked directly from PowerShell:
 
 ```powershell
 python -c "import sqlite3; con=sqlite3.connect('intern_tracker.db'); rows=con.execute('SELECT * FROM daily_work_log').fetchall(); print(rows); con.close()"
+```
+
+This retrieves all records stored in:
+
+```text
+daily_work_log
 ```
 
 ---
 
 # Current Project Status
 
-The following functionality has been completed:
+The following functionality has been implemented:
 
-- [x] Python MCP server setup
+- [x] Python MCP Server
 - [x] FastMCP integration
-- [x] SQLite database setup
-- [x] Daily Work Log table
-- [x] Add Daily Work Log
-- [x] List Daily Work Logs
-- [x] Update Work Status
-- [x] Delete Daily Work Log
-- [x] Work Summary
+- [x] SQLite database
+- [x] `daily_work_log` table
+- [x] Add Daily Work Log Tool
+- [x] List Daily Work Logs Tool
+- [x] Update Work Status Tool
+- [x] Delete Daily Work Log Tool
+- [x] Work Summary Tool
 - [x] Automatic day calculation
-- [x] Default `To Do` status
-- [x] MCP Inspector integration
+- [x] Automatic `To Do` status
+- [x] Update task status to `Done`
 - [x] SQLite data persistence
-- [x] End-to-end MCP tool testing
+- [x] MCP Inspector integration
+- [x] MCP Tool testing
+- [x] MCP Prompt implementation
+- [x] Daily Work Log Prompt
+- [x] End-to-end MCP and SQLite testing
 
 ---
 
-## Future Development
+# Future Development
 
-Future versions of the project can include:
+The project can be extended with:
 
 - MCP Resources
-- MCP Prompts
-- Additional validation
-- Duplicate work-date handling
-- Improved reporting and summaries
+- Additional MCP Prompts
+- Task editing functionality
+- Input validation
+- Duplicate date handling
+- Search functionality
+- Date-based filtering
+- Weekly work summaries
+- Monthly work summaries
+- Improved reporting
+- Export functionality
+- Integration with an MCP-compatible AI client
+
+A future architecture could look like:
+
+```text
+                 AI Client
+                     |
+                     v
+                MCP Server
+                     |
+       +-------------+-------------+
+       |             |             |
+       v             v             v
+     Tools         Prompts      Resources
+       |                           |
+       +-------------+-------------+
+                     |
+                     v
+                   SQLite
+                     |
+                     v
+              intern_tracker.db
+```
 
 ---
 
-## Developer
+# Developer
 
 **Soham Thoke**
 
-AI Engineering Intern
+AI Engineer | GenAI | Prompt Engineering
 
 ---
 
-## Project Purpose
+# Project Purpose
 
-This project was developed to understand and implement a Python-based MCP server while building a practical internship Daily Work Log tracking system using MCP tools and SQLite.
+The Task Tracker using MCP was developed to understand the practical implementation of the **Model Context Protocol** using Python.
+
+The project demonstrates how an MCP Server can expose Tools and Prompts while integrating with a persistent SQLite database.
+
+It provides hands-on experience with:
+
+- MCP Server development
+- FastMCP
+- MCP Tools
+- MCP Prompts
+- SQLite integration
+- CRUD operations
+- Persistent task storage
+- MCP Inspector
+- Client-server interaction
+
+The project serves as a practical implementation of an MCP-based task management system.
