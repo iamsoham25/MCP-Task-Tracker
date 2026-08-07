@@ -615,6 +615,7 @@ After MCP Inspector opens, the server can be tested from the browser interface.
 ### Testing Tools
 
 Open:
+
 ```text
 Tools
 ```
