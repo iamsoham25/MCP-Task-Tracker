@@ -713,8 +713,8 @@ database.py
  |
  v
 SQLite
- |
- v
+        |
+        v
 intern_tracker.db
  |
  v
