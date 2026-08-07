@@ -716,8 +716,8 @@ SQLite
         |
         v
 intern_tracker.db
- |
- v
+        |
+        v
 daily_work_log
 ```
 
